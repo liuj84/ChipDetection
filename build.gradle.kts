@@ -27,7 +27,7 @@ dependencies {
     implementation("io.pravega:pravega-connectors-flink-1.11_2.12:0.10.1")
     implementation("org.apache.flink:flink-connector-elasticsearch7_2.12:1.14.2")
 
-    val junitVersion = "5.8.2"
+    val junitVersion = "5.9.1"
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
     testImplementation("org.apache.flink:flink-test-utils_2.11:$flinkVersion")
     testImplementation("org.assertj:assertj-core:3.21.0")
