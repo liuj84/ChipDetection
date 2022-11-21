@@ -23,7 +23,7 @@ dependencies {
     val flinkVersion = "1.11.6"
     compileOnly("org.apache.flink:flink-java:$flinkVersion")
     compileOnly("org.apache.flink:flink-streaming-java_2.11:$flinkVersion")
-    implementation("org.projectlombok:lombok:1.18.22")
+    implementation("org.projectlombok:lombok:1.18.24")
     implementation("io.pravega:pravega-connectors-flink-1.11_2.12:0.10.1")
     implementation("org.apache.flink:flink-connector-elasticsearch7_2.12:1.14.2")
 
