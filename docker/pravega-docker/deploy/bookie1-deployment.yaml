@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.26.1 (a9d05d509)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: bookie1
+  name: bookie1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: bookie1
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/pravega-net: "true"
+        io.kompose.service: bookie1
+    spec:
+      containers:
+        - env:
+            - name: BK_journalMaxBackups
+              value: "1"
+            - name: BK_journalMaxSizeMB
+              value: "100"
+            - name: BK_majorCompactionInterval
+              value: "3600"
+            - name: BK_minorCompactionInterval
+              value: "1800"
+            - name: ZK_URL
+              value: zookeeper:2181
+            - name: bookiePort
+              value: "3181"
+          image: pravega/bookkeeper:0.9.0
+          name: bookie1
+          ports:
+            - containerPort: 3181
+          resources: {}
+      restartPolicy: Always
+status: {}

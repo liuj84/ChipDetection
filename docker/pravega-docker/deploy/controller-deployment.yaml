@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.26.1 (a9d05d509)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: controller
+  name: controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: controller
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/pravega-net: "true"
+        io.kompose.service: controller
+    spec:
+      containers:
+        - args:
+            - controller
+          env:
+            - name: JAVA_OPTS
+              value: |
+                -Dcontroller.service.rpc.listener.port=9090
+                -Xmx512m
+                -XX:OnError="kill -9 p%"
+                -XX:+ExitOnOutOfMemoryError
+                -XX:+CrashOnOutOfMemoryError
+                -XX:+HeapDumpOnOutOfMemoryError
+            - name: REST_SERVER_PORT
+              value: "10080"
+            - name: SERVICE_HOST_IP
+              value: segmentstore
+            - name: WAIT_FOR
+              value: zookeeper:2181
+            - name: ZK_URL
+              value: zookeeper:2181
+          image: pravega/pravega:latest
+          name: controller
+          ports:
+            - containerPort: 9090
+            - containerPort: 10080
+          resources: {}
+      restartPolicy: Always
+status: {}

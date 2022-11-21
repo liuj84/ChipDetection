@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.26.1 (a9d05d509)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: segmentstore
+  name: segmentstore
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: segmentstore
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/pravega-net: "true"
+        io.kompose.service: segmentstore
+    spec:
+      containers:
+        - args:
+            - segmentstore
+          env:
+            - name: CONTROLLER_URL
+              value: tcp://:9090
+            - name: JAVA_OPTS
+              value: |
+                -Dfilesystem.root=/pravega-lts
+                -Dpravegaservice.service.published.host.nameOrIp=
+                -Dbookkeeper.ensemble.size=1
+                -Dbookkeeper.ack.quorum.size=1
+                -Dbookkeeper.write.quorum.size=1
+                -Xmx4000m
+                -XX:OnError="kill -9 p%"
+                -XX:+ExitOnOutOfMemoryError
+                -XX:+CrashOnOutOfMemoryError
+                -XX:+HeapDumpOnOutOfMemoryError
+            - name: TIER2_STORAGE
+              value: FILESYSTEM
+            - name: WAIT_FOR
+              value: bookie1:3181
+            - name: ZK_URL
+              value: zookeeper:2181
+          image: pravega/pravega:latest
+          name: segmentstore
+          ports:
+            - containerPort: 12345
+          resources: {}
+          volumeMounts:
+            - mountPath: /pravega-lts
+              name: pravega-lts-volume
+      restartPolicy: Always
+      volumes:
+        - name: pravega-lts-volume
+          persistentVolumeClaim:
+            claimName: pravega-lts-volume
+status: {}
